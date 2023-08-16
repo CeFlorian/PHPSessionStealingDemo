@@ -1,0 +1,71 @@
+version: '3.8'
+
+networks:
+  identity-network:
+    name: default-network
+    driver: bridge
+    
+services:
+    web:
+        image: cesarflorian/site-php:v1
+        container_name: site-php
+        networks: 
+            - identity-network
+        ports:
+            - 8080:80
+        depends_on:
+            - db-app
+    web-xss:
+        image: cesarflorian/site-php-xss:v1
+        container_name: site-php-xss
+        networks: 
+            - identity-network
+        ports:
+            - 8081:80
+        depends_on:
+            - db-app
+    web-sniffing:
+        image: cesarflorian/site-php-sniffing:v1
+        container_name: site-php-sniffing
+        networks: 
+            - identity-network
+        ports:
+            - 8082:80
+        depends_on:
+            - db-app
+    store-data:
+        image: cesarflorian/store-data:v1
+        container_name: store-data
+        networks: 
+            - identity-network
+        ports:
+            - 8083:80
+        depends_on:
+            - db-claves
+
+    db-app:
+        image: cesarflorian/database_app:v1
+        container_name: db-app
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: bd_app
+            MYSQL_USER: user
+            MYSQL_PASSWORD: user
+        networks: 
+            - identity-network
+        ports:
+            - "9906:3306"
+    db-claves:
+        image: cesarflorian/database_claves:v1
+        container_name: db-claves
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: bd_claves
+            MYSQL_USER: user
+            MYSQL_PASSWORD: user
+        networks: 
+            - identity-network
+        ports:
+            - "9907:3306"
